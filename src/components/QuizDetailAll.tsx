@@ -4,7 +4,7 @@ import { Quiz } from '@/lib/types/quiz';
 import he from 'he';
 import { useRouter } from 'next/navigation';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 interface QuizDetailProps {
   quiz: Quiz;
@@ -19,6 +19,11 @@ export default function QuizDetailAll({ quiz }: QuizDetailProps) {
   const [selections, setSelections] = useState<Record<number, number>>({});
   const [isSubmitted, setSubmitted] = useState(false);
   const [score, setScore] = useState(0);
+  // implementing timer feature
+  const [timeRemain, setTimeRemain] = useState(quiz.timeLimit);
+  const minutes = Math.floor(timeRemain / 60);
+  const seconds = timeRemain % 60;
+
   const router = useRouter();
   const correctAns = useMemo(() => {
     return quiz.questions.map((question) => {
@@ -45,6 +50,17 @@ export default function QuizDetailAll({ quiz }: QuizDetailProps) {
 
     quiz.questions.forEach((question, idx) => {
       const selectedOptionIdx = selections[idx];
+
+      // Handle unanswered questions (e.g., timer ran out)
+      if (selectedOptionIdx === undefined) {
+        userAnswers.push({
+          questionId: question.id,
+          selectedOptionId: question.options[0].id, // Use first option as placeholder
+          isCorrect: false,
+        });
+        return; // Skip to next question
+      }
+
       // what option i selected can be known from selections record
       const selectedOption = question.options[selectedOptionIdx];
       const isCorrect = correctAns[idx].includes(selectedOptionIdx);
@@ -77,8 +93,31 @@ export default function QuizDetailAll({ quiz }: QuizDetailProps) {
     }
   }
   const allAnswered = Object.keys(selections).length === quiz.questions.length;
+  useEffect(() => {
+    // Don't run timer if already submitted or time is up
+    if (isSubmitted || timeRemain <= 0) return;
+
+    const intervalId = setInterval(() => {
+      setTimeRemain((prev) => {
+        // Stop at 0, don't go negative
+        if (prev <= 1) return 0;
+        return prev - 1;
+      });
+    }, 1000);
+
+    // Cleanup: clear interval when effect re-runs or component unmounts
+    return () => clearInterval(intervalId);
+  }, [isSubmitted]); // Re-run when isSubmitted changes to stop timer
+  useEffect(() => {
+    if (timeRemain <= 0 && !isSubmitted) {
+      handleSubmit();
+    }
+  }, [timeRemain, isSubmitted]);
   return (
     <div className="bg-white max-w-2xl mx-auto p-6">
+      <div className="text-center text-2xl font-medium text-gray-700">
+        ⏱ {minutes}:{seconds.toString().padStart(2, '0')}
+      </div>
       <div className="text-center">
         <h1 className="text-2xl font-bold mb-2 text-slate-800">{quiz.title}</h1>
         <p className="text-slate-500 mb-6">{quiz.questions.length} questions</p>
