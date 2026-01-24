@@ -2,6 +2,8 @@
 import { savequizAttempt } from '@/actions/quiz';
 import { Quiz } from '@/lib/types/quiz';
 import he from 'he';
+import { useRouter } from 'next/navigation';
+
 import { useMemo, useState } from 'react';
 
 interface QuizDetailProps {
@@ -17,6 +19,7 @@ export default function QuizDetailAll({ quiz }: QuizDetailProps) {
   const [selections, setSelections] = useState<Record<number, number>>({});
   const [isSubmitted, setSubmitted] = useState(false);
   const [score, setScore] = useState(0);
+  const router = useRouter();
   const correctAns = useMemo(() => {
     return quiz.questions.map((question) => {
       return question.options
@@ -59,11 +62,16 @@ export default function QuizDetailAll({ quiz }: QuizDetailProps) {
 
     // Save to database
     try {
-      await savequizAttempt({
+      const attempt = await savequizAttempt({
         quizId: quiz.id,
         score: calculatedScore,
         userAnswers,
       });
+      const attemptId = attempt.id;
+      if (attemptId) {
+        router.push(`/quiz/${quiz.id}/results/${attemptId}`);
+      }
+      console.log(score);
     } catch (error) {
       console.error('Failed to save quiz attempt:', error);
     }

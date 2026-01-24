@@ -1,7 +1,7 @@
 // server actions
 'use server';
-import { auth } from '@clerk/nextjs/server';
 import prisma from '@/lib/prisma';
+import { auth, currentUser } from '@clerk/nextjs/server';
 import {
   createQuizSchema,
   QuizAttemptInput,
@@ -107,17 +107,44 @@ export async function getQuizById(quizId: string) {
 // we are taking data from client as parameters
 // we need to validate it
 export async function savequizAttempt(data: QuizAttemptInput) {
-  // first validate it
   const { userId } = await auth();
+  // auth() function returns auth object of current active user.
   if (!userId) {
     throw new Error('You must be logged in to submit.');
   }
+
+  // Get Clerk user details and sync to our DB
+  const clerkUser = await currentUser();
+  // currentUser() can only be used in server components.
+  if (!clerkUser) {
+    throw new Error('User not found.');
+  }
+
+  // Upsert user in our database (create if not exists, update if exists)
+  await prisma.user.upsert({
+    where: { id: userId },
+    update: {
+      name: clerkUser.firstName || clerkUser.emailAddresses[0]?.emailAddress || 'User',
+      email: clerkUser.emailAddresses[0]?.emailAddress || '',
+      emailVerified: clerkUser.emailAddresses[0]?.verification?.status === 'verified',
+      image: clerkUser.imageUrl,
+    },
+    create: {
+      id: userId,
+      name: clerkUser.firstName || clerkUser.emailAddresses[0]?.emailAddress || 'User',
+      email: clerkUser.emailAddresses[0]?.emailAddress || '',
+      emailVerified: clerkUser.emailAddresses[0]?.verification?.status === 'verified',
+      image: clerkUser.imageUrl,
+    },
+  });
+
   const validated = quizAttemptSchema.safeParse(data);
   if (!validated.success) {
     throw new Error('Invalid quiz attempt schema.');
   }
+
   const { quizId, score, userAnswers } = validated.data;
-  return await prisma.quizAttempt.create({
+  const savedQuizAttempt = await prisma.quizAttempt.create({
     data: {
       userId,
       quizId,
@@ -131,4 +158,25 @@ export async function savequizAttempt(data: QuizAttemptInput) {
       },
     },
   });
+  return savedQuizAttempt;
+}
+
+export async function getQuizAttemptById(attemptId: string) {
+  const attempt = await prisma.quizAttempt.findUnique({
+    where: { id: attemptId },
+    include: {
+      quiz: true, // gets quiz title, description etc.
+      userAnswers: {
+        include: {
+          question: {
+            include: {
+              options: true, // all options for this question
+            },
+          },
+          selectedOption: true, // the option user selected.
+        },
+      },
+    },
+  });
+  return attempt;
 }
