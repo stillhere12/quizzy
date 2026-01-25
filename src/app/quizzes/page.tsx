@@ -1,6 +1,6 @@
 import { getQuizzes } from '@/actions/quiz';
-import Link from 'next/link';
 import SignedInUser from '@/components/SignedInUser';
+import Link from 'next/link';
 
 const difficultyColors = {
   EASY: 'bg-emerald-100 text-emerald-700',
@@ -8,7 +8,7 @@ const difficultyColors = {
   HARD: 'bg-rose-100 text-rose-700',
 };
 
-export default async function DashboardPage() {
+export default async function Quizzes() {
   const quizzes = await getQuizzes();
   return (
     <main className="min-h-screen bg-slate-50">
