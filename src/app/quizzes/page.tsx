@@ -13,8 +13,12 @@ export default async function Quizzes() {
   return (
     <main className="min-h-screen bg-slate-50">
       <div className="max-w-5xl mx-auto px-6 py-12">
-        <h1 className="text-2xl font-semibold text-slate-800 mb-8 text-center">Quizzes</h1>
-
+        <div className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow mb-8 text-center">
+          <h1 className="text-2xl font-semibold text-slate-800 mb-8">Quizzes</h1>
+          <Link href="/dashboard" className="bg-blue-200 text-blue-600 px-4 py-2 rounded-md">
+            Dashboard
+          </Link>
+        </div>
         {quizzes.length === 0 ? (
           <p className="text-slate-500">No quizzes available.</p>
         ) : (

@@ -21,7 +21,7 @@ export default async function Dashboard() {
       style={{ fontFamily: font }}
     >
       <header className="flex items-center justify-center">
-        <p className="text-sm text-gray-700">{`Total Attempts: ${totalAttempts}`}</p>
+        <p className="text-xl font-bold italic text-black">{`Total Attempts: ${totalAttempts}`}</p>
       </header>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="flex flex-col space-y-4">
@@ -38,10 +38,9 @@ export default async function Dashboard() {
                   {attempt.score}
                 </span>
                 <span className="block text-sm text-gray-500" style={{ fontFamily: font }}>
-                  {attempt.quiz.timeLimit.toLocaleString()}
+                  {attempt.quiz.timeLimit} seconds.
                 </span>
-                Score: {attempt.score} / {attempt.quiz.questionCount} (
-                {attempt.quiz.timeLimit.toLocaleString()})
+                Score: {attempt.score} / {attempt.quiz.questionCount}
               </li>
             ))}
           </ul>
@@ -80,7 +79,7 @@ export default async function Dashboard() {
                   {category.category}
                 </span>
                 <span className="block text-sm text-gray-500">
-                  Average Score: {category.avgScore}% ({category.attemptCount})
+                  Average Score: {category.avgScore.toFixed(2)}% ({category.attemptCount} attempts)
                 </span>
               </li>
             ))}
