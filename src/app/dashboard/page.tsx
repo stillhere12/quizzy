@@ -23,7 +23,7 @@ export default async function Dashboard() {
       <header className="flex items-center justify-center">
         <p className="text-xl font-bold italic text-black">{`Total Attempts: ${totalAttempts}`}</p>
       </header>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="flex flex-col">
         <div className="flex flex-col space-y-4">
           <h2 className="text-2xl font-bold text-[#3498db]" style={{ fontFamily: font }}>
             Recent Attempts
