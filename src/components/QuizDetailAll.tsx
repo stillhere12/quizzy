@@ -35,7 +35,7 @@ export default function QuizDetailAll({ quiz }: QuizDetailProps) {
   }, [quiz.questions]);
   function handleSelect(questionIdx: number, optionIdx: number) {
     if (isSubmitted) return;
-    console.log(selections);
+    // console.log(selections);
 
     setSelections((prev) => ({ ...prev, [questionIdx]: optionIdx }));
   }
@@ -91,7 +91,7 @@ export default function QuizDetailAll({ quiz }: QuizDetailProps) {
       if (attemptId) {
         router.push(`/quiz/${quiz.id}/results/${attemptId}`);
       }
-      console.log(score);
+      // console.log(score);
     } catch (error) {
       console.error('Failed to save quiz attempt:', error);
     }

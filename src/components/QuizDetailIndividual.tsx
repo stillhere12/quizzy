@@ -37,7 +37,7 @@ export default function QuizDetailIndividual({ quiz }: QuizDetailProps) {
   function handleSubmit(questionIdx: number) {
     const selectedOption = selections[questionIdx];
     if (selectedOption === undefined) return; // No option selected
-    console.log(correctAnswers);
+    // console.log(correctAnswers);
     const isCorrect = correctAnswers[questionIdx].includes(selectedOption);
     if (isCorrect) {
       setScore((prev) => prev + 1);
