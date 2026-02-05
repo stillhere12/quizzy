@@ -4,7 +4,7 @@ async function fetchData(url: string) {
   const jsonData = await response.json();
   // what jsonData is returning is json of response code and results array
   //   console.log(jsonData);
-  console.log(jsonData.results);
+  // console.log(jsonData.results);
   // this is results array......
   // and each individual result is an object {type, difficulty, category, question, correct_answer, incorrect_answers}
 }
