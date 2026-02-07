@@ -1,18 +1,18 @@
 // server actions
-'use server';
-import prisma from '@/lib/prisma';
-import { auth, currentUser } from '@clerk/nextjs/server';
+"use server";
+import prisma from "@/lib/prisma";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import {
   createQuizSchema,
   QuizAttemptInput,
   quizAttemptSchema,
   type CreateQuiz,
-} from '../lib/schemas/quiz';
+} from "../lib/schemas/quiz";
 
 export default async function createQuiz(data: CreateQuiz) {
   const validatedData = createQuizSchema.safeParse(data);
   if (!validatedData.success) {
-    throw new Error('Invalid quiz data');
+    throw new Error("Invalid quiz data");
   }
   // proceed to create quiz in the database
   // zod returns the validated data in the .data property
@@ -66,7 +66,7 @@ export default async function createQuiz(data: CreateQuiz) {
  * Supports optional filtering by difficulty and category
  */
 export async function getQuizzes(filters?: {
-  difficulty?: 'EASY' | 'MEDIUM' | 'HARD';
+  difficulty?: "EASY" | "MEDIUM" | "HARD";
   category?: string;
 }) {
   const filterDifficulty = filters?.difficulty;
@@ -76,7 +76,7 @@ export async function getQuizzes(filters?: {
       difficulty: filterDifficulty,
       category: filterCategory,
     },
-    orderBy: { createdAt: 'desc' },
+    orderBy: { createdAt: "desc" },
   });
   return quizzes;
 }
@@ -109,37 +109,45 @@ export async function savequizAttempt(data: QuizAttemptInput) {
   const { userId } = await auth();
   // auth() function returns auth object of current active user.
   if (!userId) {
-    throw new Error('You must be logged in to submit.');
+    throw new Error("You must be logged in to submit.");
   }
 
   // Get Clerk user details and sync to our DB
   const clerkUser = await currentUser();
   // currentUser() can only be used in server components.
   if (!clerkUser) {
-    throw new Error('User not found.');
+    throw new Error("User not found.");
   }
 
   // Upsert user in our database (create if not exists, update if exists)
   await prisma.user.upsert({
     where: { id: userId },
     update: {
-      name: clerkUser.firstName || clerkUser.emailAddresses[0]?.emailAddress || 'User',
-      email: clerkUser.emailAddresses[0]?.emailAddress || '',
-      emailVerified: clerkUser.emailAddresses[0]?.verification?.status === 'verified',
+      name:
+        clerkUser.firstName ||
+        clerkUser.emailAddresses[0]?.emailAddress ||
+        "User",
+      email: clerkUser.emailAddresses[0]?.emailAddress || "",
+      emailVerified:
+        clerkUser.emailAddresses[0]?.verification?.status === "verified",
       image: clerkUser.imageUrl,
     },
     create: {
       id: userId,
-      name: clerkUser.firstName || clerkUser.emailAddresses[0]?.emailAddress || 'User',
-      email: clerkUser.emailAddresses[0]?.emailAddress || '',
-      emailVerified: clerkUser.emailAddresses[0]?.verification?.status === 'verified',
+      name:
+        clerkUser.firstName ||
+        clerkUser.emailAddresses[0]?.emailAddress ||
+        "User",
+      email: clerkUser.emailAddresses[0]?.emailAddress || "",
+      emailVerified:
+        clerkUser.emailAddresses[0]?.verification?.status === "verified",
       image: clerkUser.imageUrl,
     },
   });
 
   const validated = quizAttemptSchema.safeParse(data);
   if (!validated.success) {
-    throw new Error('Invalid quiz attempt schema.');
+    throw new Error("Invalid quiz attempt schema.");
   }
 
   const { quizId, score, userAnswers } = validated.data;
@@ -184,14 +192,14 @@ export async function getQuizAttemptById(attemptId: string) {
 export async function showDashboard() {
   const { userId } = await auth();
   if (!userId) {
-    throw new Error('You must be logged in to submit.');
+    throw new Error("You must be logged in to submit.");
   }
 
   // Get Clerk user details and sync to our DB
   const clerkUser = await currentUser();
   // currentUser() can only be used in server components.
   if (!clerkUser) {
-    throw new Error('User not found.');
+    throw new Error("User not found.");
   }
   // what to show in dashboard.
   // showing location of the user.
@@ -201,7 +209,7 @@ export async function showDashboard() {
     include: {
       quiz: true,
     },
-    orderBy: { completedAt: 'desc' },
+    orderBy: { completedAt: "desc" },
     take: 10,
   });
   // Aggregate stats
@@ -226,7 +234,10 @@ export async function showDashboard() {
   // Filter out attempts with null scores/dates and map to required shape
   const attemptsForImprovement = recentattempts
     .filter((a) => a.score !== null && a.completedAt !== null)
-    .map((a) => ({ score: a.score as number, completedAt: a.completedAt as Date }));
+    .map((a) => ({
+      score: a.score as number,
+      completedAt: a.completedAt as Date,
+    }));
   const improvementScore = calculateImprovement(attemptsForImprovement);
 
   return {
@@ -255,15 +266,20 @@ async function getCategoryPerformance(userId: string) {
       quiz: { select: { category: true } },
     },
   });
-  const categoryPerformanceMap: Map<string, { totalScore: number; attemptCount: number }> =
-    new Map();
+  const categoryPerformanceMap: Map<
+    string,
+    { totalScore: number; attemptCount: number }
+  > = new Map();
   attempts.forEach((attempt) => {
     const category = attempt.quiz.category;
     const score = attempt.score;
     if (!score) return;
     const currentObject = categoryPerformanceMap.get(category) || null;
     if (!currentObject) {
-      categoryPerformanceMap.set(category, { totalScore: score, attemptCount: 1 });
+      categoryPerformanceMap.set(category, {
+        totalScore: score,
+        attemptCount: 1,
+      });
       return;
     }
     categoryPerformanceMap.set(category, {
@@ -297,27 +313,31 @@ async function getCategoryPerformance(userId: string) {
 /**
  * Calculate if user is improving by comparing recent vs older attempts
  */
-function calculateImprovement(attempts: { score: number; completedAt: Date }[]): {
-  trend: 'improving' | 'declining' | 'stable';
+function calculateImprovement(
+  attempts: { score: number; completedAt: Date }[]
+): {
+  trend: "improving" | "declining" | "stable";
   percentage: number;
 } {
   if (attempts.length < 4) {
-    return { trend: 'stable', percentage: 0 };
+    return { trend: "stable", percentage: 0 };
   }
 
   const midpoint = Math.floor(attempts.length / 2);
   const recentAttempts = attempts.slice(0, midpoint);
   const olderAttempts = attempts.slice(midpoint);
 
-  const recentAvg = recentAttempts.reduce((sum, a) => sum + a.score, 0) / recentAttempts.length;
-  const olderAvg = olderAttempts.reduce((sum, a) => sum + a.score, 0) / olderAttempts.length;
+  const recentAvg =
+    recentAttempts.reduce((sum, a) => sum + a.score, 0) / recentAttempts.length;
+  const olderAvg =
+    olderAttempts.reduce((sum, a) => sum + a.score, 0) / olderAttempts.length;
 
   const percentageChange = ((recentAvg - olderAvg) / olderAvg) * 100;
 
-  let trend: 'improving' | 'declining' | 'stable';
-  if (percentageChange > 5) trend = 'improving';
-  else if (percentageChange < -5) trend = 'declining';
-  else trend = 'stable';
+  let trend: "improving" | "declining" | "stable";
+  if (percentageChange > 5) trend = "improving";
+  else if (percentageChange < -5) trend = "declining";
+  else trend = "stable";
 
   return { trend, percentage: Math.round(percentageChange) };
 }

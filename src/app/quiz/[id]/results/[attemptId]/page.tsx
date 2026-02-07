@@ -12,6 +12,7 @@ export default async function ResultsAttempt({
   const { id, attemptId } = await params;
   const gotQuizAttempt = await getQuizAttemptById(attemptId);
   if (!gotQuizAttempt) {
+    console.log('Quiz attempt not found');
     return notFound();
   }
   const total = gotQuizAttempt.userAnswers.length;

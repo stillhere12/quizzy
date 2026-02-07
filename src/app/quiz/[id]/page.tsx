@@ -19,7 +19,7 @@ export default async function QuizPage({ params }: { params: { id: string } }) {
 
   return (
     <div className="bg-white">
-      <QuizDetailAll quiz={quiz} />
+      <QuizDetailAll quiz={quiz}/>
     </div>
   );
 }

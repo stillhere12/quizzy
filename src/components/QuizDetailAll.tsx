@@ -1,12 +1,13 @@
-'use client';
-import { savequizAttempt } from '@/actions/quiz';
-import { Quiz } from '@/lib/types/quiz';
-import { confetti } from '@tsparticles/confetti';
-import he from 'he';
-import { useRouter } from 'next/navigation';
-
-import { useEffect, useMemo, useState } from 'react';
-import ProgressBar from './ProgressBar';
+"use client";
+import { savequizAttempt } from "@/actions/quiz";
+import { Quiz } from "@/lib/types/quiz";
+import { confetti } from "@tsparticles/confetti";
+import he from "he";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
+import ProgressBar from "./ProgressBar";
+import { log } from "console";
 
 interface QuizDetailProps {
   quiz: Quiz;
@@ -43,7 +44,7 @@ export default function QuizDetailAll({ quiz }: QuizDetailProps) {
     return correctAns[questionIdx].includes(optionIdx);
   }
   function handleCelebration() {
-    confetti('tsparticles', {
+    confetti("tsparticles", {
       count: 100,
       spread: 70,
       origin: { y: 0.6 },
@@ -99,11 +100,11 @@ export default function QuizDetailAll({ quiz }: QuizDetailProps) {
       const attemptId = attempt.id;
       // after saving to db now route....
       if (attemptId) {
-        router.push(`/quiz/${quiz.id}/results/${attemptId}`);
+        console.log("debug", attemptId);
       }
       // console.log(score);
     } catch (error) {
-      console.error('Failed to save quiz attempt:', error);
+      console.error("Failed to save quiz attempt:", error);
     }
   }
   const allAnswered = Object.keys(selections).length === quiz.questions.length;
@@ -124,6 +125,7 @@ export default function QuizDetailAll({ quiz }: QuizDetailProps) {
   }, [isSubmitted]); // Re-run when isSubmitted changes to stop timer
   useEffect(() => {
     if (timeRemain <= 0 && !isSubmitted) {
+      console.log("debug", timeRemain);
       handleSubmit();
     }
   }, [timeRemain, isSubmitted]);
@@ -135,13 +137,13 @@ export default function QuizDetailAll({ quiz }: QuizDetailProps) {
         <div
           className={`gap-2 px-4 py-1.5 rounded-full border text-sm font-semibold transition-colors ${
             timeRemain <= 10
-              ? 'bg-rose-50 border-rose-200 text-rose-700'
+              ? "bg-rose-50 border-rose-200 text-rose-700"
               : timeRemain <= 30
-                ? 'bg-amber-50 border-amber-200 text-amber-700'
-                : 'bg-white border-slate-200 text-slate-700 shadow-sm'
+              ? "bg-amber-50 border-amber-200 text-amber-700"
+              : "bg-white border-slate-200 text-slate-700 shadow-sm"
           }`}
         >
-          ⏱ {minutes}:{seconds.toString().padStart(2, '0')}
+          ⏱ {minutes}:{seconds.toString().padStart(2, "0")}
         </div>
       </div>
 
@@ -153,7 +155,9 @@ export default function QuizDetailAll({ quiz }: QuizDetailProps) {
       {/* Quiz header */}
       <div className="text-center mb-8">
         <h1 className="text-2xl font-bold text-slate-800 mb-1">{quiz.title}</h1>
-        <p className="text-sm text-slate-500">{quiz.questions.length} questions</p>
+        <p className="text-sm text-slate-500">
+          {quiz.questions.length} questions
+        </p>
       </div>
 
       {/* Question cards */}
@@ -188,8 +192,8 @@ export default function QuizDetailAll({ quiz }: QuizDetailProps) {
                     disabled={isSubmitted}
                     className={`flex items-center gap-3 py-2 px-3 rounded-lg transition-colors ${
                       isSelected
-                        ? 'bg-sky-50 border-sky-200 text-sky-700'
-                        : 'border-slate-200 text-slate-700 hover:bg-slate-50'
+                        ? "bg-sky-50 border-sky-200 text-sky-700"
+                        : "border-slate-200 text-slate-700 hover:bg-slate-50"
                     }`}
                   >
                     <span>{he.decode(option.text)}</span>
@@ -205,8 +209,10 @@ export default function QuizDetailAll({ quiz }: QuizDetailProps) {
       {/* Answered count */}
       <p className="mt-6 text-center text-sm text-slate-500">
         {allAnswered
-          ? 'All questions answered — ready to submit!'
-          : `${Object.keys(selections).length} of ${quiz.questions.length} answered`}
+          ? "All questions answered — ready to submit!"
+          : `${Object.keys(selections).length} of ${
+              quiz.questions.length
+            } answered`}
       </p>
 
       {/* Submit button / Score card */}
@@ -216,19 +222,34 @@ export default function QuizDetailAll({ quiz }: QuizDetailProps) {
           disabled={!allAnswered}
           className={`mt-4 w-full py-3 rounded-xl font-semibold text-sm transition-all ${
             allAnswered
-              ? 'bg-slate-800 text-white hover:bg-slate-700 shadow-sm'
-              : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+              ? "bg-slate-800 text-white hover:bg-slate-700 shadow-sm"
+              : "bg-slate-200 text-slate-400 cursor-not-allowed"
           }`}
         >
           Submit Quiz
         </button>
       ) : (
         <div className="mt-6 p-5 bg-emerald-50 border border-emerald-200 rounded-xl text-center shadow-sm">
-          <p className="text-emerald-600 text-sm font-medium mb-1">Your Score</p>
-          <p className="text-emerald-800 font-bold text-3xl">
-            {score}{' '}
-            <span className="text-lg font-medium text-emerald-600">/ {quiz.questions.length}</span>
+          <p className="text-emerald-600 text-sm font-medium mb-1">
+            Your Score
           </p>
+          <p className="text-emerald-800 font-bold text-3xl">
+            {score}{" "}
+            <span className="text-lg font-medium text-emerald-600">
+              / {quiz.questions.length}
+            </span>
+          </p>
+          <p className="text-sm text-emerald-600">
+            Time taken: {minutes}:{seconds.toString().padStart(2, "0")}
+          </p>
+          <button className="mt-4 w-full py-3 rounded-xl font-semibold text-sm transition-all bg-slate-800 text-white hover:bg-slate-700 shadow-sm">
+            <Link href="/quizzes">Go back to quizzes</Link>
+          </button>
+          <Link href="/dashboard">
+            <button className="mt-4 w-full py-3 rounded-xl font-semibold text-sm transition-all bg-slate-800 text-white hover:bg-slate-700 shadow-sm">
+              Dashboard
+            </button>
+          </Link>
         </div>
       )}
     </div>

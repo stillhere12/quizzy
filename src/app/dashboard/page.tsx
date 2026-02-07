@@ -1,6 +1,6 @@
-import { showDashboard } from '@/actions/quiz';
-import UserTime from '@/components/UserTime';
-import LocalTime from '@/components/LocalTime';
+import { showDashboard } from "@/actions/quiz";
+import UserTime from "@/components/UserTime";
+import LocalTime from "@/components/LocalTime";
 
 export default async function Dashboard() {
   const data = await showDashboard();
@@ -27,23 +27,33 @@ export default async function Dashboard() {
       </header>
       <div className="flex flex-col">
         <div className="flex flex-col space-y-4">
-          <h2 className="text-2xl font-bold text-[#3498db]" style={{ fontFamily: font }}>
+          <h2
+            className="text-2xl font-bold text-[#3498db]"
+            style={{ fontFamily: font }}
+          >
             Recent Attempts
           </h2>
           <ul className="list-none space-y-2">
             {recentAttempts.map((attempt) => (
-              <li key={attempt.id} className="bg-[#f1f5f9] p-2 rounded-md shadow-md">
+              <li
+                key={attempt.id}
+                className="bg-[#f1f5f9] p-2 rounded-md shadow-md"
+              >
                 <span
                   className="block text-xl font-semibold text-[#212529]"
                   style={{ fontFamily: font }}
                 >
                   {attempt.score}
                 </span>
-                <span className="block text-sm text-gray-500" style={{ fontFamily: font }}>
+                <span
+                  className="block text-sm text-gray-500"
+                  style={{ fontFamily: font }}
+                >
                   {attempt.quiz.timeLimit} seconds.
                 </span>
                 {/* took help from claude pass this to client */}
-                <LocalTime timestamp={attempt.startedAt} />
+                {/* above was showing server time not needed */}
+                {/* I want time when user clicks start and user clicks end */}
                 <span>
                   <UserTime />
                 </span>
@@ -53,26 +63,44 @@ export default async function Dashboard() {
           </ul>
         </div>
         <div className="flex flex-col space-y-4">
-          <h2 className="text-2xl font-bold text-[#3498db]" style={{ fontFamily: font }}>
+          <h2
+            className="text-2xl font-bold text-[#3498db]"
+            style={{ fontFamily: font }}
+          >
             Statistics
           </h2>
           <ul className="list-none space-y-2">
-            <li className="bg-[#f1f5f9] p-2 rounded-md shadow-md" style={{ fontFamily: font }}>
+            <li
+              className="bg-[#f1f5f9] p-2 rounded-md shadow-md"
+              style={{ fontFamily: font }}
+            >
               Average Score: {averageScore}
             </li>
-            <li className="bg-[#f1f5f9] p-2 rounded-md shadow-md" style={{ fontFamily: font }}>
+            <li
+              className="bg-[#f1f5f9] p-2 rounded-md shadow-md"
+              style={{ fontFamily: font }}
+            >
               Min Score: {minScore}
             </li>
-            <li className="bg-[#f1f5f9] p-2 rounded-md shadow-md" style={{ fontFamily: font }}>
+            <li
+              className="bg-[#f1f5f9] p-2 rounded-md shadow-md"
+              style={{ fontFamily: font }}
+            >
               Max Score: {maxScore}
             </li>
-            <li className="bg-[#f1f5f9] p-2 rounded-md shadow-md" style={{ fontFamily: font }}>
+            <li
+              className="bg-[#f1f5f9] p-2 rounded-md shadow-md"
+              style={{ fontFamily: font }}
+            >
               Improvement Score: {improvementScore.percentage}%
             </li>
           </ul>
         </div>
         <div className="flex flex-col space-y-4">
-          <h2 className="text-2xl font-bold text-[#3498db]" style={{ fontFamily: font }}>
+          <h2
+            className="text-2xl font-bold text-[#3498db]"
+            style={{ fontFamily: font }}
+          >
             Category Performance
           </h2>
           <ul className="list-none space-y-2">
@@ -86,7 +114,8 @@ export default async function Dashboard() {
                   {category.category}
                 </span>
                 <span className="block text-sm text-gray-500">
-                  Average Score: {category.avgScore.toFixed(2)}% ({category.attemptCount} attempts)
+                  Average Score: {category.avgScore.toFixed(2)}% (
+                  {category.attemptCount} attempts)
                 </span>
               </li>
             ))}
