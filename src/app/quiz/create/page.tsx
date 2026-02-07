@@ -74,7 +74,7 @@ function QuestionItem({
   } = useFieldArray({ control, name: `questions.${qIndex}.options` });
 
   return (
-    <div className="border border-gray-300 p-3 rounded-md space-y-2">
+    <div className="p-3 rounded-md space-y-2">
       <div className="flex items-center justify-between">
         <label className="text-lg font-bold">Question {qIndex + 1}</label>
         <button
@@ -118,7 +118,9 @@ function QuestionItem({
             />
             <label className="flex items-center gap-1">
               <input
-                {...register(`questions.${qIndex}.options.${optIndex}.isCorrect`)}
+                {...register(
+                  `questions.${qIndex}.options.${optIndex}.isCorrect`
+                )}
                 type="checkbox"
               />
               Correct
@@ -192,17 +194,20 @@ export default function QuizCreatePage() {
   return (
     <form
       onSubmit={handleSubmit(onSubmit, onError)}
-      className="border-2 border-black space-y-4 p-4"
+      className="space-y-4 p-4"
       noValidate
     >
-      <div className="text-2xl font-bold">Quiz Information</div>
+      <div className="text-2xl font-bold text-center text-slate-800 mb-8">
+        Quiz Information
+      </div>
 
       <div>
         <label className="text-lg font-bold block">Title</label>
         <input
-          className="border-2 border-black px-2 py-1 w-full"
+          className="border-2 border-black px-2 py-1 w-full rounded-md"
           {...register("info.title")}
           type="text"
+          placeholder="Enter quiz title"
         />
         {errors.info?.title && (
           <p className="text-red-600 text-sm">{errors.info.title.message}</p>
@@ -212,22 +217,30 @@ export default function QuizCreatePage() {
       <div>
         <label className="text-lg font-bold block">Description</label>
         <input
-          className="border-2 border-black px-2 py-1 w-full"
+          className="border-2 border-black px-2 py-1 w-full rounded-md"
           {...register("info.description")}
           type="text"
+          placeholder="Enter quiz description"
         />
         {errors.info?.description && (
-          <p className="text-red-600 text-sm">{errors.info.description.message}</p>
+          <p className="text-red-600 text-sm">
+            {errors.info.description.message}
+          </p>
         )}
       </div>
 
       <div>
         <label className="text-lg font-bold block">Category</label>
-        <input
-          className="border-2 border-black px-2 py-1 w-full"
+        <select
+          className="border-2 border-black px-2 py-1 w-full rounded-md"
           {...register("info.category")}
-          type="text"
-        />
+        >
+          <option value="GENERAL">General</option>
+          <option value="SCIENCE">Science</option>
+          <option value="ART">Art</option>
+          <option value="SPORTS">Sports</option>
+          <option value="ENTERTAINMENT">Entertainment</option>
+        </select>
         {errors.info?.category && (
           <p className="text-red-600 text-sm">{errors.info.category.message}</p>
         )}
@@ -236,25 +249,33 @@ export default function QuizCreatePage() {
       <div>
         <label className="text-lg font-bold block">Difficulty</label>
         <select
-          className="border-2 border-black px-2 py-1 w-full"
+          className="border-2 border-black px-2 py-1 w-full rounded-md"
           {...register("info.difficulty")}
         >
           <option value="EASY">Easy</option>
           <option value="MEDIUM">Medium</option>
           <option value="HARD">Hard</option>
         </select>
+        {errors.info?.difficulty && (
+          <p className="text-red-600 text-sm">
+            {errors.info.difficulty.message}
+          </p>
+        )}
       </div>
 
       <div>
         <label className="text-lg font-bold block">Time Limit (minutes)</label>
         <input
-          className="border-2 border-black px-2 py-1 w-full"
+          className="border-2 border-black px-2 py-1 w-full rounded-md"
           {...register("info.timeLimit", { valueAsNumber: true })}
           type="number"
           min={1}
+          placeholder="Enter time limit in minutes"
         />
         {errors.info?.timeLimit && (
-          <p className="text-red-600 text-sm">{errors.info.timeLimit.message}</p>
+          <p className="text-red-600 text-sm">
+            {errors.info.timeLimit.message}
+          </p>
         )}
       </div>
 
