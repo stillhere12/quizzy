@@ -194,7 +194,9 @@ export async function showDashboard() {
     throw new Error('User not found.');
   }
   // what to show in dashboard.
-  const attempts = await prisma.quizAttempt.findMany({
+  // showing location of the user.
+  const recentattempts = await prisma.quizAttempt.findMany({
+    // attempts is actually QuizAttempt from prisma
     where: { userId },
     include: {
       quiz: true,
@@ -222,13 +224,13 @@ export async function showDashboard() {
 
   // Calculate improvement: compare recent vs older attempts
   // Filter out attempts with null scores/dates and map to required shape
-  const attemptsForImprovement = attempts
+  const attemptsForImprovement = recentattempts
     .filter((a) => a.score !== null && a.completedAt !== null)
     .map((a) => ({ score: a.score as number, completedAt: a.completedAt as Date }));
   const improvementScore = calculateImprovement(attemptsForImprovement);
 
   return {
-    recentAttempts: attempts,
+    recentAttempts: recentattempts,
     totalAttempts: stats._count.id,
     averageScore: stats._avg.score,
     minScore: stats._min.score,

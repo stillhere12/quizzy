@@ -44,6 +44,24 @@ export const createQuizSchema = z.object({
   questions: z.array(createQuestionSchema).min(1, 'Quiz must have at least 1 question.'),
 });
 
+// below schema is used for custom quiz creation
+
+export const createQuizDetailsSchema = z.object({
+  id: z.string().optional(),
+  title: z.string().min(1).max(100),
+  description: z.string().max(500).optional(),
+  questionCount: z.number().int().min(1).max(100),
+  timeLimit: z.number().int().min(10).max(3600),
+  difficulty: z.enum(['EASY', 'MEDIUM', 'HARD']),
+  category: z.string().min(1).max(100),
+});
+
+// below schema is for options created for custom quiz
+export const createOptionDetailsSchema = z.object({
+  text: z.string().min(1).max(200),
+  isCorrect: z.boolean(),
+});
+
 export const quizIdSchema = z.string().cuid();
 export const userAnswerSchema = z.object({
   questionId: z.string(),

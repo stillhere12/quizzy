@@ -1,4 +1,6 @@
-import { showDashboard } from '../../actions/quiz';
+import { showDashboard } from '@/actions/quiz';
+import UserTime from '@/components/UserTime';
+import LocalTime from '@/components/LocalTime';
 
 export default async function Dashboard() {
   const data = await showDashboard();
@@ -40,8 +42,10 @@ export default async function Dashboard() {
                 <span className="block text-sm text-gray-500" style={{ fontFamily: font }}>
                   {attempt.quiz.timeLimit} seconds.
                 </span>
-                <span className="block text-md font-bold">
-                  {attempt.startedAt.toLocaleString()}
+                {/* took help from claude pass this to client */}
+                <LocalTime timestamp={attempt.startedAt} />
+                <span>
+                  <UserTime />
                 </span>
                 Score: {attempt.score} / {attempt.quiz.questionCount}
               </li>

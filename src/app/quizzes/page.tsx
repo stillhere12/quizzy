@@ -1,4 +1,5 @@
 import { getQuizzes } from '@/actions/quiz';
+import QuizzesPageInteraction from '@/components/QuizzesPageInteraction';
 import SignedInUser from '@/components/SignedInUser';
 import Link from 'next/link';
 
@@ -49,12 +50,7 @@ export default async function Quizzes() {
                   </div>
 
                   <button>
-                    <Link
-                      href={`/quiz/${quiz.id}`}
-                      className="px-5 py-2 bg-slate-900 text-white text-sm font-medium rounded-lg hover:bg-slate-800 transition-colors"
-                    >
-                      Start
-                    </Link>
+                    <QuizzesPageInteraction quizId={quiz.id} />
                   </button>
                 </div>
               </div>
